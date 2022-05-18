@@ -49,10 +49,10 @@ void harris_demo(int, void*) {
 	cornerHarris(src_gray, dst, blockSize,ksize,k,BORDER_DEFAULT);
 	
 	//最大最小值归一化
-
 	Mat nor_dst, normScaleDst;//用于存储归一化的值
 	normalize(dst,nor_dst,0,255,NORM_MINMAX,CV_32FC1,Mat());
-	convertScaleAbs(nor_dst, normScaleDst);
+	convertScaleAbs(nor_dst, normScaleDst);   //将计算绝对值并将结果转换为 8 位
+
 
 	//标记
 	Mat resultImg = src.clone(); 
@@ -69,7 +69,6 @@ void harris_demo(int, void*) {
 			}
 			currentRow++;//下一个指针
 		}
-
 	}
 	
 	imshow("output", resultImg);
