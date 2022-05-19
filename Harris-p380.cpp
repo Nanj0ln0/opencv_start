@@ -51,11 +51,16 @@ void harris_demo(int, void*) {
 	//最大最小值归一化
 	Mat nor_dst, normScaleDst;//用于存储归一化的值
 	normalize(dst,nor_dst,0,255,NORM_MINMAX,CV_32FC1,Mat());
-	convertScaleAbs(nor_dst, normScaleDst);   //将计算绝对值并将结果转换为 8 位
+	
+	
+	convertScaleAbs(nor_dst, normScaleDst);   //将计算绝对值并将结果转换为 8 位，可能可以不要
 
 
 	//标记
 	Mat resultImg = src.clone(); 
+
+	//第一种实现方式
+	/*
 	for (int row = 0; row < resultImg.rows; row++)
 	{
 		uchar* currentRow = normScaleDst.ptr(row);
@@ -70,6 +75,22 @@ void harris_demo(int, void*) {
 			currentRow++;//下一个指针
 		}
 	}
+	*/
+
+	//另一种实现方式
+	for (int row = 0; row < nor_dst.rows; row++)
+	{
+		for (int col = 0; col < nor_dst.cols; col++)
+		{
+			if ((int)nor_dst.at<float>(row, col) > thresh)
+			{
+				circle(resultImg, Point(col, row), 2, Scalar(0, 0, 0), 2, 8, 0);
+			}
+
+		}
+
+	}
+
 	
 	imshow("output", resultImg);
 }
