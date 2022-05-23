@@ -8,5 +8,5 @@ using namespace cv::xfeatures2d;
 
 int main() {
 
-
+	Mat src;
 }
