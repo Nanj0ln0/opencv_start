@@ -1,16 +1,14 @@
 #include <opencv2/opencv.hpp>
 #include <iostream>
-#include <opencv2/xfeatures2d.hpp>
 #include <math.h>
 
 using namespace cv;
 using namespace std;
-using namespace cv::xfeatures2d;
 
 const char* input = "input_picture";
 const char* output = "ELPB_out";
 
-int minR=3;
+int minR =3;
 int maxR=20;
 void ELPB_demo(int,void*);
 
@@ -38,6 +36,7 @@ int main() {
 	return 0;
 }
 
+
 void ELPB_demo(int, void*) {
 
 	int offset = minR * 2;
@@ -49,9 +48,35 @@ void ELPB_demo(int, void*) {
 	for (int n = 0; n < numNeightbors; n++)
 	{
 		//算出第一个点的位置
-		float x = static_cast<float>(minR * 2) * cos(2 * CV_PI * n / static_cast<float>(numNeightbors));
-		float y = static_cast<float>(minR * 2) * sin(2 * CV_PI * n / static_cast<float>(numNeightbors))
+		float x = static_cast<float>(minR) * cos(2 * CV_PI * n / static_cast<float>(numNeightbors));
+		float y = static_cast<float>(minR) * -sin(2 * CV_PI * n / static_cast<float>(numNeightbors));
 
+		int fx = static_cast<int>(floor(x));
+		int fy = static_cast<int>(floor(y)); 
+		//双线性差值
+		int cx = static_cast<int>(ceil(x));
+		int cy = static_cast<int>(ceil(y));
+		//计算权重
+		float ty = y - fy;
+		float tx = x - fx;
+
+		float w1 = (1 - tx) * (1 - ty);
+		float w2 = tx * (1 - ty);
+		float w3 = (1 - tx) * ty;
+		float w4 = tx * ty;
+
+		for (int row = minR; row < (height - minR); row++)
+		{
+			for (int col = minR; col < (width - minR); col++)
+			{
+				float t = w1 * src_gray.at<uchar>(row+fy,col+fx)+ w2 * src_gray.at<uchar>(row + fy, col + fx)+ 
+					w3 * src_gray.at<uchar>(row + fy, col + fx)+ w4 * src_gray.at<uchar>(row + fy, col + fx);
+				
+				elbpImg.at<uchar>(row - minR, col - minR)+=
+				((t>src_gray.at<uchar>(row,col)) && (abs(t- src_gray.at<uchar>(row, col)) > std::numeric_limits<float>::epsilon()))<<n;
+			}
+		}
 	}
-
+	imshow(output,elbpImg);
+	return;
 }

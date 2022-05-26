@@ -15,6 +15,9 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="example.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
     <ClCompile Include="ELBP.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
