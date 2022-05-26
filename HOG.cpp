@@ -21,20 +21,25 @@ int main() {
 
 	//简单实现HOG检测
 	/*
-	Mat src_resize;
+	  //改变圆图像尺寸大小   64*128
+	Mat src_resize;         
 	resize(src,src_resize,Size(64,128));
-
+	  //转变图像色彩空间至灰度
 	Mat src_gray;
 	cvtColor(src_resize,src_gray,COLOR_BGR2GRAY);
 
+	 //定义HOG的描述子  detector
 	HOGDescriptor detector(Size(64,128),Size(16,16),Size(8,8),Size(8,8),9);
-	vector<float> descriptors;
-	vector<Point> locations;
-	
-	detector.compute(src_gray,descriptors,Size(0,0),Size(0,0),locations);
+	//计算的参数定义
+	vector<float> descriptors;  //存放特征点的空间
+	vector<Point> locations;	//存放
+	 //使用描述子的comput计算功能
+	detector.compute(src_gray,descriptors,Size(0,0),Size(0,0),locations); //窗口的步长使用(0,0)的默认值，padding(0,0)默认值
 	printf("特征点有%d个",descriptors.size());
 	*/
 	
+
+	//HOG+SVM行人检测
 	HOGDescriptor hog = HOGDescriptor();
 	hog.setSVMDetector(hog.getDefaultPeopleDetector());
 
