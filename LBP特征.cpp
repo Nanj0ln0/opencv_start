@@ -5,7 +5,6 @@
 using namespace cv;
 using namespace std;
 using namespace cv::xfeatures2d;
-
 const char* input = "input_picture";
 
 int	main() {
