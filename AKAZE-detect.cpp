@@ -30,18 +30,15 @@ int main() {
 	detector->detectAndCompute(scene,Mat(),KeyPoints_scene,descritor_scene);
 
 
-	/*
 	//matching flann∆•≈‰  √Ë ˆ◊”
-	FlannBasedMatcher matcher(new flann::LshIndexParams(20, 10, 2));
-	//FlannBasedMatcher matcher;
-	vector<DMatch> matches;
-	matcher.match(descritor_obj,descritor_scene,matches,Mat());
-	*/
+	FlannBasedMatcher matcher;
 	
 	//±©¡¶∆•≈‰
-	BFMatcher matcher(NORM_L2);
+	//BFMatcher matcher(NORM_L2);
+
+	// matcher;
 	vector<DMatch> matches;
-	matcher.match(descritor_obj, descritor_scene, matches);
+	matcher.match(descritor_obj,descritor_scene,matches);
 
 	//ª≠≥ˆ√Ë ˆ◊”
 	Mat matchesImg;
@@ -112,6 +109,7 @@ int main() {
 	line(akazematchImg,scene_corners[1]+Point2f(obj.cols,0),scene_corners[2] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
 	line(akazematchImg,scene_corners[2]+Point2f(obj.cols,0),scene_corners[3] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
 	line(akazematchImg,scene_corners[3]+Point2f(obj.cols,0),scene_corners[0] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
+
 
 	namedWindow("akazematchImg",CV_WINDOW_AUTOSIZE);
 	imshow("akazematchImg", akazematchImg);
