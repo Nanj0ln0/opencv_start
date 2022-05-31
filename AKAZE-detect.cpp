@@ -22,20 +22,27 @@ int main() {
 	imshow("scene", scene);
 
 	//kaze detection
-	Ptr<AKAZE>detector = AKAZE::create();
+	Ptr<KAZE>detector = KAZE::create();
 	vector<KeyPoint>KeyPoints_obj;
 	vector<KeyPoint>KeyPoints_scene;
 	Mat descritor_obj, descritor_scene;  //描述子
 	detector->detectAndCompute(obj,Mat(),KeyPoints_obj,descritor_obj);
 	detector->detectAndCompute(scene,Mat(),KeyPoints_scene,descritor_scene);
 
+
+	/*
 	//matching flann匹配  描述子
 	FlannBasedMatcher matcher(new flann::LshIndexParams(20, 10, 2));
 	//FlannBasedMatcher matcher;
 	vector<DMatch> matches;
 	matcher.match(descritor_obj,descritor_scene,matches,Mat());
+	*/
 	
-	
+	//暴力匹配
+	BFMatcher matcher(NORM_L2);
+	vector<DMatch> matches;
+	matcher.match(descritor_obj, descritor_scene, matches);
+
 	//画出描述子
 	Mat matchesImg;
 	drawMatches(obj,KeyPoints_obj,scene,KeyPoints_scene,matches,matchesImg);
@@ -70,14 +77,46 @@ int main() {
 		}
 
 	}
-	
+
 	Mat akazematchImg;
-	drawMatches(obj,KeyPoints_obj,scene,KeyPoints_scene,goodmatches,akazematchImg,Scalar::all(-1), Scalar::all(-1),vector<char>(),2);
-	imshow("match",akazematchImg);
+	drawMatches(obj, KeyPoints_obj, scene, KeyPoints_scene, goodmatches, akazematchImg, Scalar::all(-1), Scalar::all(-1), vector<char>(), 2);
+
+	//把图像标记出来
+	//预定义
+	vector<Point2f>point_obj;
+	vector<Point2f>point_scene;
+
+	for (size_t i = 0; i < goodmatches.size(); i++)
+	{
+		point_obj.push_back(KeyPoints_obj[goodmatches[i].queryIdx].pt);
+		point_scene.push_back(KeyPoints_scene[goodmatches[i].trainIdx].pt);
+	}
+
+	Mat H = findHomography(point_obj,point_scene,RANSAC);
+
+
+	//定义4个角
+	vector<Point2f>obj_corners(4);
+	obj_corners[0] = Point(0, 0);
+	obj_corners[1] = Point(obj.cols, 0);
+	obj_corners[2] = Point(obj.cols, obj.rows);
+	obj_corners[3] = Point(0, obj.rows);
+
+	//定义场景里的4个角
+	vector<Point2f>scene_corners(4);
+	perspectiveTransform(obj_corners,scene_corners,H);
+
+	//画框框
 	
+	line(akazematchImg,scene_corners[0]+Point2f(obj.cols,0),scene_corners[1] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
+	line(akazematchImg,scene_corners[1]+Point2f(obj.cols,0),scene_corners[2] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
+	line(akazematchImg,scene_corners[2]+Point2f(obj.cols,0),scene_corners[3] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
+	line(akazematchImg,scene_corners[3]+Point2f(obj.cols,0),scene_corners[0] + Point2f(obj.cols, 0),Scalar::all(-1),2,8,0);
 
-
-
+	namedWindow("akazematchImg",CV_WINDOW_AUTOSIZE);
+	imshow("akazematchImg", akazematchImg);
+	
+	
 
 	waitKey(0);
 	return 0;
